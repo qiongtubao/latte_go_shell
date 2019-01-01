@@ -1,0 +1,33 @@
+{
+	"name": "latte_shell",
+	"version": "0.0.1",
+	"description": "latte_shell",
+	"keywords": [
+		"latte",
+		"latte_webServer"
+	],
+	"author": "qiongtubao",
+	"main": "index.js",
+	"scripts": {
+		"installLatteJs": "npm install && sh ./shell/installLatteJs.sh && node ./shell/installLatteJs.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/qiongtubao/latte_shell.git"
+	},
+	"dependencies": {
+		"latte_lib": "git+https://github.com/qiongtubao/latte_lib.git#feature/ts",
+		"latte_run_shell": "git+https://github.com/qiongtubao/latte_run_shell.git#master",
+		"@types/node": "*",
+		"mocha": "*",
+		"typescript": "*",
+		"ts-node": "*",
+		"shelljs": "*",
+		"@types/shelljs": "*"
+	},
+	"installShell": {
+		"typescript": "*",
+		"ts-node": "*",
+		"yarn": "*"
+	}
+}
