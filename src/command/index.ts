@@ -5,6 +5,28 @@ import { readFileSync } from "fs";
 import * as shellJs from 'shelljs';
 import { async } from "latte_lib"
 
+
+export let build = function(url, options, callback) {
+  let goPath
+  let arrays = [(cb) => {
+    shellJs.exec(`export GOPATH=$GOPATH:${options.goPath};go build ${url} `, (err, data) => {
+      cb()
+    })
+  }];
+  async.series(arrays, (err, data) => {
+    // callback(err, data)
+    if(err) {
+      return shellJs.exec(`export GOPATH=${goPath}`, () => {
+        callback(err)
+      }) 
+      
+    }
+    shellJs.exec(`export GOPATH=${data[0]}`, ()=> {
+      callback(err, data)
+    }) 
+  })  
+}
+
 export let run = function (url, options, callback) {
   let goPath
   let arrays = [(cb) => {

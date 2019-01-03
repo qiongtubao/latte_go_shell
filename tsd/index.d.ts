@@ -1,3 +1,4 @@
 import run from "./run";
 import install from "./install";
-export { run, install };
+import build from "./build";
+export { run, install, build };
