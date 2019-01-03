@@ -9,7 +9,8 @@ export default function handle(...args) {
         return 
     }
     command.run(config.main, {
-        goPath: process.cwd()
+        goPath: process.cwd(),
+        params: args
     }, (err, data) => {
         if(err) {
             console.error("错误:", err)

@@ -8,7 +8,7 @@ import { async } from "latte_lib"
 export let run = function (url, options, callback) {
   let goPath
   let arrays = [(cb) => {
-    shellJs.exec(`export GOPATH=$GOPATH:${options.goPath};go run ${url}`, (err, data) => {
+    shellJs.exec(`export GOPATH=$GOPATH:${options.goPath};go run ${url} ${options.params.join(' ')}`, (err, data) => {
       cb()
     })
   }];
