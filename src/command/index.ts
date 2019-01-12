@@ -27,6 +27,27 @@ export let build = function(url, options, callback) {
   })  
 }
 
+export let test = function(url, options, callback) {
+  let goPath
+  let arrays = [(cb) => {
+    shellJs.exec(`export GOPATH=$GOPATH:${options.goPath};go test -v`, (err, data) => {
+      cb()
+    })
+  }];
+  async.series(arrays, (err, data) => {
+    // callback(err, data)
+    if(err) {
+      return shellJs.exec(`export GOPATH=${goPath}`, () => {
+        callback(err)
+      }) 
+      
+    }
+    shellJs.exec(`export GOPATH=${data[0]}`, ()=> {
+      callback(err, data)
+    }) 
+  }) 
+}
+
 export let run = function (url, options, callback) {
   let goPath
   let arrays = [(cb) => {
