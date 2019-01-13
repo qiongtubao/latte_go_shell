@@ -3,7 +3,7 @@ import * as Path from "path"
 import * as command from "../command"
 import * as latte_lib from "latte_lib"
 export default function handle(...args) {
-    let config = command.readGoConfig()
+    let config = command.readGoConfig(process.cwd())
     if(!config) {
         console.error("not find config")
         return 
