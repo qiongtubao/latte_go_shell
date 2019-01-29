@@ -8,8 +8,14 @@ export default function handle(...args) {
         console.error("not find config")
         return 
     }
-    command.test(config.main, {
-        goPath: process.cwd(),
+    let goPath = ''
+    let pwd = process.cwd()
+    let srcIndex = pwd.indexOf('/src/')
+    if(srcIndex != -1) {
+        goPath = ':' + pwd.substr(0, srcIndex)
+    } 
+    command.test(config.testDir || [], {
+        goPath: pwd + goPath,
         params: args
     }, (err, data) => {
         if(err) {

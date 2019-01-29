@@ -1,11 +1,20 @@
 import * as child_process from "child_process";
 import * as latte_run_shell from "latte_run_shell"
 import * as fs from "fs"
-import { readFileSync } from "fs";
 import * as shellJs from 'shelljs';
+import * as Path from 'path'
 import { async } from "latte_lib"
 
-
+function mkdirSync(path, options?) {
+  if(fs.existsSync(path)) {
+    return null;
+  }
+  if(!fs.existsSync(Path.dirname(path))) {
+    var error = mkdirSync(Path.dirname(path), options);
+    if(error) { return error; }
+  }
+  return fs.mkdirSync(path, options);
+}
 export let build = function (url, options, callback) {
   let goPath
   let arrays = [(cb) => {
@@ -27,13 +36,20 @@ export let build = function (url, options, callback) {
   })
 }
 
-export let test = function (url, options, callback) {
+export let test = function (testDir: string[], options, callback) {
   let goPath
-  let arrays = [(cb) => {
-    shellJs.exec(`export GOPATH=$GOPATH:${options.goPath};go test -v`, (err, data) => {
+  let arrays = testDir.map(data => {
+    return (cb) => {
+      shellJs.exec(`export GOPATH=$GOPATH:${options.goPath};cd ./${data} && go test -v`, (err, data) => {
+        cb()
+      })
+    }
+  });
+  arrays.unshift((cb) => {
+    shellJs.exec(`export GOPATH=$GOPATH:${options.goPath}; go test -v`, (err, data) => {
       cb()
     })
-  }];
+  })
   async.series(arrays, (err, data) => {
     // callback(err, data)
     if (err) {
@@ -72,7 +88,7 @@ export function readGoConfig(dirname): any {
   //const dirname = process.cwd()
   let configData
   try {
-    configData = readFileSync(dirname + '/package.json').toString()
+    configData = fs.readFileSync(dirname + '/package.json').toString()
   } catch (err) {
     //console.error("not find package.json", err)
     return
@@ -99,13 +115,33 @@ export function gets(data, options, callback) {
   }];
   Object.keys(data).map((key) => {
     arrays.push((cb) => {
-      child_process.exec(`sh ${__dirname}/../../shell/goInstall.sh ${goRoot.trim()}  ${data[key]}`, {
+      let ps = data[key].split('/');
+      let filename = ps.pop()
+      let dirPath = ps.join('/')
+      console.log(`${process.cwd()}/src/${dirPath}`)
+      let error = mkdirSync(`${process.cwd()}/src/${dirPath}`)
+      if(error) {
+        return cb(error)
+      }
+      child_process.exec(`sh ${__dirname}/../../shell/goInstall2.sh ${goRoot.trim()}  ${dirPath} ${filename}`, {
         env: {
-          'GOPATH': options.goPath
+          'GOPATH': options.goPath,
         }
       }, (err, stdout, stderr) => {
         if (err) {
-          console.log(err)
+          //return cb(err)
+          console.log('??????????',err)
+          // if(data[key].indexOf('github.com/') == 0) {
+          //   return child_process.exec(`sh ${__dirname}/../../shell/goInstall.sh ${goRoot.trim()} ${data[key]}`, {
+          //     env: {
+          //       'GOPATH': options.goPath
+          //     }
+          //   }, (err, stdout, stderr) => {
+          //     return cb(err)
+          //   })
+          // }else{
+          //   return cb(err)
+          // }
           return cb(err)
         }
         cb()
